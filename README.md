@@ -12,7 +12,7 @@ Some scientific results on the sine-Gordon equation in a tree-like geometry were
 Any comments are welcome!
 
 ## Authors
-  
+
 * [Denys Dutykh](http://www.denys-dutykh.com/)
 * [Jean-Guy Caputo](http://lmi.insa-rouen.fr/membres/20-caputo.html)
 
