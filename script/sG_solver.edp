@@ -1,0 +1,169 @@
+// -------------------------------------------------------- //
+// FreeFem++ script to solve:                               //
+// The sine-Gordon equation in a Y-junction geometry        //
+// -------------------------------------------------------- //
+// Author1 : Denys Dutykh, CNRS-LAMA, University of Savoie  //
+// Email   : Denys.Dutykh@crans.org                         //
+// URL     : http://www.denys-dutykh.com/                   //
+// -------------------------------------------------------- //
+// Author2 : Jean-Guy Caputo, INSA de Rouen, France         //
+// Email   : caputo@insa-rouen.fr                           //
+// URL     : http://http://lmi.insa-rouen.fr/~caputo/       //
+// -------------------------------------------------------- //
+
+verbosity = 0;  // no output from FreeFem++
+
+real L = 10.0;	// Length of the each branch
+real th = 45*pi/180.0;	// half-angle between the branches
+
+real w0 = 1.0;	// width of the main branch
+real w1 = 1.0;	// width of two outgoing branches
+
+// some auxiliary variables to describe the geometry:
+real w02 = 0.5*w0;
+real delta = w1/sin(th) - 0.5*w0/tan(th);
+
+real x1 = w02+L*sin(th);
+real y1 = L*cos(th);
+
+real x2 = (w02 + L)*sin(th);
+real y2 = delta + (L+w02)*cos(th);
+
+//// Mesh declaration
+real h = 0.04;	// relative cell size
+
+int B = 1;	// label to define the boundary
+// First we declare individual lines: (length)
+border L0(t=0,1) {x = -w02; y = -L*t; label = B;} // L
+border L1(t=0,1) {x = -w02*(1-t) + w02*t; y = -L; label = B;} // w0
+border L2(t=0,1) {x = w02; y = -L*(1-t); label = B;} // L
+border L3(t=0,1) {x = w02*(1-t) + x1*t; y = y1*t; label = B;} // L
+border L4(t=0,1) {x = x1*(1-t) + x2*t; y = y1*(1-t) + y2*t; label=B;} // w1
+border L5(t=0,1) {x = x2*(1-t); y = y2*(1-t) + delta*t; label=B;} // L
+border L6(t=0,1) {x = -x2*t; y = delta*(1-t) + y2*t; label=B;} // L
+border L7(t=0,1) {x = -x2*(1-t) - x1*t; y = y2*(1-t) + y1*t; label=B;}; // w1
+border L8(t=0,1) {x = -x1*(1-t) - w02*t; y = y1*(1-t); label=B;} // L
+
+// We can plot the contour of the domain to check it (uncomment the following line):
+// plot(L0(25) + L1(5) + L2(25) + L3(25) + L4(5) + L5(25) + L6(25) + L7(5) + L8(25), wait=true);
+
+int NL = ceil(L/h);
+int Nw0 = ceil(w0/h);
+int Nw1 = ceil(w1/h);
+
+// finaly the domain is discretized into finite elements:
+mesh Th = buildmesh(L0(NL) + L1(Nw0) + L2(NL) + L3(NL) + L4(Nw1) + L5(NL) + L6(NL) + L7(Nw1) + L8(NL));
+
+// We use the quadratic Lagrangian elements to solve the sine-Gordon equation:
+fespace Vh(Th,P2);
+
+// The space P1 is used for the output:
+fespace Wh(Th,P1);
+// More precisely, the numerical solution is projected onto the P1 space 
+// to get the nodal data on the unstructured mesh
+
+// Display the mesh and export it as an EPS figure (uncomment if needed):
+// plot(Th, wait=true, ps="Mesh_Y_Junction.eps");
+
+// We print also some general information about the mesh:
+Vh hh = hTriangle;
+cout << endl << "Max element size = " << hh[].max << endl;
+cout << "Min element size = " << hh[].min << endl;
+cout << "Average element size = " << 0.5*(hh[].min + hh[].max) << endl << endl;
+
+// we write the results in the current directory:
+string path = "./"; // change when necessary
+
+savemesh(Th, path+"Junction.msh");	// save the mesh
+
+// Time discretization parameters:
+real Tf = 18.0;   // final simulation time
+int M = 3500;     // number of time steps
+int Nwrite = 10;  // we write results each Nw time steps
+real dt = Tf/M;		// time step
+real dt2 = dt*dt;	// dt^2
+
+// Let us print the time step size:
+cout << "Time step = " << dt << endl;
+
+//// We set-up the initial condition:
+// Here we give an example of the kink solution propagating through the junction:
+real u0 = 0.96;	  // kink's speed
+real y0 = -0.5*L;	// kink's initial position
+
+real sq = sqrt(1.0 - u0*u0);    // inverse of the Lorenz factor
+// Two first time steps need to be initialized:
+Vh Aux = exp((y-y0)/sq);        // The solution zt t = 0
+Vh Aux1 = exp((y-y0-u0*dt)/sq); // and at t = dt
+
+Vh phi0 = 4.0*atan(Aux);  // Kink's shape at t = 0
+Vh phi1 = 4.0*atan(Aux1);	// Kink's shape at t = dt
+
+real E0 = 8.0*w0/sq;		  // initial energy computed analytically
+
+//// We save the initial condition:
+Wh phiW; // projection variable belonging to the P1 space
+{
+    phiW = phi0;
+    ofstream file(path + "Solution0.bb");
+    file << "2 1 1 " << phiW[].n << " 2\n";
+    for (int k=0; k < phiW[].n ; k++)
+      file << phiW[][k] << endl;
+}
+
+//// Variables needed to describe the weak formulation of the sine-Gordon equation:
+Vh phi, psi;
+Vh phim1;
+
+int op = 0;
+
+// Weak formulation:
+problem SG(phi,psi,init=op,solver=CG) = int2d(Th)(phi*psi + 0.5*dt2*(dx(phi)*dx(psi) + dy(phi)*dy(psi))) + int2d(Th)(0.5*dt2*(dx(phi0)*dx(psi) + dy(phi0)*dy(psi))) + int2d(Th)(((phi0 - 2.0*phi1) + dt2*sin(phi1))*psi);
+
+// Some real variables to compute the energy
+real ET, EtB, EtL, EtR;
+// ET  : total energy
+// EtB : energy in the bottom branch of the Y-junction
+// EtL : energy containing in the left branch
+// EtR : energy containing in the right branch
+
+// We save also the energy evolution in all the branches:
+ofstream filE(path + "EnergyCons.txt");
+
+// The main loop in time:
+for (int j=1; j<=M; j++)
+{
+  SG;     // solve the sG equation
+  op = 1;
+  
+  phim1 = phi0;
+  phi0 = phi1; phi1 = phi;
+  
+  if (j % Nwrite == 0) // if the time to output the result has come:
+  {
+    // Let us compute the energies in each branch:
+    ET = int2d(Th)(0.5*square((phi1-phim1)/(2*dt)) + 0.5*(square(dx(phi0)) + square(dy(phi0))) + 1 - cos(phi0));
+
+    EtB = int2d(Th)((0.5*square((phi1-phi0)/dt) + 0.5*(square(dx(phi1)) + square(dy(phi1))) + 1 - cos(phi1))*(y < 0));
+
+    EtL = int2d(Th)((0.5*square((phi1-phi0)/dt) + 0.5*(square(dx(phi1)) + square(dy(phi1))) + 1 - cos(phi1))*(y > 0)*(x < 0));
+
+    EtR = int2d(Th)((0.5*square((phi1-phi0)/dt) + 0.5*(square(dx(phi1)) + square(dy(phi1))) + 1 - cos(phi1))*(y > 0)*(x > 0));
+
+    { // save the current solution for the post-processing later:
+      phiW = phi;
+      ofstream file(path + "Solution" + j + ".bb");
+      file << "2 1 1 " << phiW[].n << " 2\n";
+      for (int k=0; k < phiW[].n ; k++)
+        file << phiW[][k] << endl;
+    }
+    
+    // Display the current time and the total energy for the check:
+    cout << "Time = " << dt*j << "; Energy total  = " << ET << endl;
+    // save the energy data into the file:
+    filE << dt*j << "    " << ET << "    " << EtB << "    " << EtL << "    " << EtR << endl;
+
+    // finally we plot the current state of the solution:
+    plot(phi, fill=true);
+  }
+}
