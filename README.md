@@ -13,8 +13,8 @@ Any comments are welcome!
 
 ## Authors
 
-* [Denys Dutykh](http://www.denys-dutykh.com/)
-* [Jean-Guy Caputo](http://lmi.insa-rouen.fr/membres/20-caputo.html)
+* [Denys Dutykh](http://www.denys-dutykh.com/) ([CNRS](http://www.cnrs.fr/insmi/) - [LAMA](http://lama.univ-savoie.fr/index.php), [University of Savoie](http://www.univ-savoie.fr/))
+* [Jean-Guy Caputo](http://lmi.insa-rouen.fr/membres/20-caputo.html) ([LMI](http://lmi.insa-rouen.fr/index.html) - [INSA de Rouen](http://www.insa-rouen.fr/accueil/index_html/view?set_language=en))
 
 ======
 
