@@ -13,9 +13,8 @@ Any comments are welcome!
 
 ## Authors
   
-[Denys Dutykh](http://www.denys-dutykh.com/)
-
-[Jean-Guy Caputo](http://lmi.insa-rouen.fr/membres/20-caputo.html)
+* [Denys Dutykh](http://www.denys-dutykh.com/)
+* [Jean-Guy Caputo](http://lmi.insa-rouen.fr/membres/20-caputo.html)
 
 ======
 
