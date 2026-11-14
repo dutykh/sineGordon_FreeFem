@@ -8,7 +8,7 @@
 // -------------------------------------------------------- //
 // Author2 : Jean-Guy Caputo, INSA de Rouen, France         //
 // Email   : caputo@insa-rouen.fr                           //
-// URL     : http://http://lmi.insa-rouen.fr/~caputo/       //
+// URL     : http://lmi.insa-rouen.fr/~caputo/              //
 // -------------------------------------------------------- //
 
 verbosity = 0;  // no output from FreeFem++

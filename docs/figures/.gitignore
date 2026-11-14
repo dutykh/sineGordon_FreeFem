@@ -1,0 +1,4 @@
+*.bb
+*.msh
+EnergyCons.txt
+__pycache__/

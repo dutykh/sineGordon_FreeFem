@@ -1,0 +1,52 @@
+# Dr. Denys Dutykh (Mathematics Department, Khalifa University of Science and Technology, Abu Dhabi, UAE)
+cff-version: 1.2.0
+message: "If you use this code, please cite the article given under preferred-citation."
+title: "sineGordon_FreeFem: a sine-Gordon kink crossing a Y junction, by finite elements in FreeFem++"
+type: software
+authors:
+  - family-names: Dutykh
+    given-names: Denys
+    affiliation: "Khalifa University of Science and Technology"
+    orcid: "https://orcid.org/0000-0001-5247-2788"
+  - family-names: Caputo
+    given-names: Jean-Guy
+    affiliation: "INSA de Rouen"
+repository-code: "https://github.com/dutykh/sineGordon_FreeFem"
+license: MIT
+version: 1.0.0
+date-released: "2026-11-14"
+keywords:
+  - sine-gordon
+  - solitons
+  - nonlinear-waves
+  - wave-propagation
+  - graphs
+  - partial-differential-equations
+  - finite-element-method
+  - crank-nicolson
+  - numerical-methods
+  - freefem
+abstract: >-
+  FreeFem++ script that solves the two-dimensional sine-Gordon equation in a Y junction of three branches, with a
+  homogeneous Neumann condition on the boundary, by quadratic Lagrange finite elements and a three-level scheme in time,
+  implicit in the Laplacian and explicit in the sine, which keeps the energy. It computes a kink of speed 0.96 that
+  crosses the fork and splits into two kinks, one in each upper branch, and writes the solution and the energy in each
+  branch.
+preferred-citation:
+  type: article
+  title: "Nonlinear Waves in Networks: Model Reduction for the Sine-Gordon Equation"
+  authors:
+    - family-names: Caputo
+      given-names: Jean-Guy
+    - family-names: Dutykh
+      given-names: Denys
+  journal: "Physical Review E"
+  volume: 90
+  issue: "2"
+  start: "022912"
+  year: 2014
+  doi: "10.1103/PhysRevE.90.022912"
+  identifiers:
+    - type: url
+      value: "https://arxiv.org/abs/1402.6446"
+      description: "arXiv preprint"
