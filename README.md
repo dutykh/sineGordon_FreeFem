@@ -92,6 +92,27 @@ python3 docs/figures/plot_readme_figure.py results
 FreeFem++, free software for Linux, macOS and Windows, available at https://freefem.org/ (checked with FreeFem++ 4.17;
 the script dates from 2014).
 
+## A note on the article
+
+Three details of the article differ from what the script computes. Equation (17) averages the Laplacian over the
+levels n + 1 and n, while the scheme that conserves the energy, and the one that `sG_solver.edp` integrates, averages it
+over the levels n + 1 and n − 1; in the notation of the article,
+
+```text
+(φⁿ⁺¹ − 2φⁿ + φⁿ⁻¹, ψ)/Δt² + ½ [ ∇(φⁿ⁺¹ + φⁿ⁻¹), ∇ψ ] + (sin φⁿ, ψ) = 0.
+```
+
+The discrete energy (18) prints its cosine term with a minus sign; it is
+
+```text
+ℰₙ = ½ ∫ [ ((φⁿ⁺¹ − φⁿ⁻¹)/(2Δt))² + |∇φⁿ|² + 2(1 − cos φⁿ) ] dx dy,
+```
+
+the discrete form of the energy E above. Fig. 4 plots the signed relative change (ℰ(t) − ℰ(0))/ℰ(0), as its vertical
+axis says, which takes negative values, and not the absolute deviation |ℰₙ − ⟨ℰₙ⟩|/⟨ℰₙ⟩ that its caption names. The
+script uses the scheme and the energy written here, so that the computations and the results of the article are not
+affected.
+
 ## How to cite
 
 If you use this code, please cite the article:
